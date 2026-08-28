@@ -1,13 +1,23 @@
 const express = require("express");
+const authRouter = require("./routes/auth.routes");
+const { errorHandler } = require("./middlewares/error.middleware");
 
 const app = express();
 
-app.use("/", (req, res) => {
-  res.send("Hello from Home Route");
+app.use(express.json());
+
+// Health-check route
+app.get("/", (_request, response) => {
+  response.status(200).json({
+    success: true,
+    message: "DevTinder API is running",
+  });
 });
 
-const PORT = process.env.PORT || 3001;
+// Auth routes
+app.use("/api/auth", authRouter);
 
-app.listen(PORT, () => {
-  console.log("Server is running on port 3000");
-});
+// Error middleware always routes ke baad
+app.use(errorHandler);
+
+module.exports = app;
