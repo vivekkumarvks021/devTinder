@@ -1,4 +1,5 @@
 const AUTH_COOKIE_NAME = "authToken";
+const SEVEN_DAYS_IN_MILLISECONDS = 7 * 24 * 60 * 60 * 1000;
 
 function getAuthCookieOptions() {
   const isProduction = process.env.NODE_ENV === "production";

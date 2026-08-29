@@ -12,8 +12,6 @@ const { requireAuth } = require("../middlewares/auth.middleware");
 
 const authRouter = express.Router();
 
-console.log("signupSchema:", signupSchema);
-
 authRouter.post("/signup", validate(signupSchema), signup);
 
 authRouter.post("/login", validate(loginSchema), login);
