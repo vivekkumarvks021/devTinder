@@ -8,7 +8,7 @@ async function updateProfile(userId, input) {
       $set: input,
     },
     {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     },
   );
