@@ -1,10 +1,12 @@
 const express = require("express");
 const authRouter = require("./routes/auth.routes");
 const { errorHandler } = require("./middlewares/error.middleware");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 // Health-check route
 app.get("/", (_request, response) => {

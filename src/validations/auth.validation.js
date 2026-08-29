@@ -25,4 +25,16 @@ const signupSchema = z.object({
   skills: z.array(z.string().trim().min(1).max(50)).max(20).optional(),
 });
 
-module.exports = { signupSchema };
+const loginSchema = z
+  .object({
+    email: z
+      .string()
+      .trim()
+      .email("Please provide a valid email address")
+      .toLowerCase(),
+
+    password: z.string().min(1, "Password is required"),
+  })
+  .strict();
+
+module.exports = { signupSchema, loginSchema };
