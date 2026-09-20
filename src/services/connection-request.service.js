@@ -2,6 +2,7 @@ const { ConnectionRequest } = require("../models/connection-request");
 
 const User = require("../models/user");
 const { AppError } = require("../utils/app-error");
+const USER_SAFE_DATA = "firstName lastName";
 
 function isDuplicateKeyError(error) {
   return (
@@ -96,7 +97,56 @@ async function reviewConnectionRequest(loggedInUserId, input) {
   return updatedRequest;
 }
 
+const getPendingRequests = async (loggedInUserId) => {
+  const pendingRequest = await ConnectionRequest.find({
+    toUserId: loggedInUserId,
+    status: "interested",
+  })
+    .select(["fromUserId"])
+    .populate("fromUserId", "firstName");
+
+  return pendingRequest;
+};
+
+const getConnections = async (loggedInUserId) => {
+  const connections = await ConnectionRequest.find({
+    $or: [{ toUserId: loggedInUserId }, { fromUserId: loggedInUserId }],
+    status: "accepted",
+  })
+    .select("fromUserId toUserId")
+    .populate("fromUserId", "firstName")
+    .populate("toUserId", "firstName");
+
+  return connections;
+};
+
+const getFeeds = async (loggedInUserId, skip, limit) => {
+  // find which one to not include
+  const alreadyConnected = await ConnectionRequest.find({
+    $or: [{ toUserId: loggedInUserId }, { fromUserId: loggedInUserId }],
+  }).select("toUserId fromUserId");
+
+  const excludeUserIds = new Set([loggedInUserId.toString()]);
+
+  alreadyConnected.map((request) => {
+    excludeUserIds.add(request.toUserId.toString());
+    excludeUserIds.add(request.fromUserId.toString());
+  });
+
+  const feed = await User.find({
+    _id: { $nin: Array.from(excludeUserIds) },
+  })
+    .select(USER_SAFE_DATA)
+    .skip(skip)
+    .limit(limit);
+
+  return feed;
+};
+
 module.exports = {
   sendConnectionRequest,
   reviewConnectionRequest,
+  getPendingRequests,
+  getConnections,
+  getFeeds,
 };

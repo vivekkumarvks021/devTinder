@@ -4,6 +4,7 @@ const { errorHandler } = require("./middlewares/error.middleware");
 const cookieParser = require("cookie-parser");
 const profileRouter = require("./routes/profile.routes");
 const connectionRequestRouter = require("./routes/connection-request.routes");
+const { userRouter } = require("./routes/user.routes");
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.get("/", (_request, response) => {
 app.use("/api/auth", authRouter);
 app.use("/api/profile", profileRouter);
 app.use("/api/requests", connectionRequestRouter);
+app.use("/api/users", userRouter);
 
 // Error middleware always routes ke baad
 app.use(errorHandler);
