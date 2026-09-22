@@ -29,9 +29,7 @@ async function editProfile(request, response, next) {
     return response.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      data: {
-        user: updatedUser,
-      },
+      user: updatedUser,
     });
   } catch (error) {
     next(error);

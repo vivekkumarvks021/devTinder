@@ -2,7 +2,8 @@ const { ConnectionRequest } = require("../models/connection-request");
 
 const User = require("../models/user");
 const { AppError } = require("../utils/app-error");
-const USER_SAFE_DATA = "firstName lastName";
+const USER_SAFE_DATA =
+  "firstName lastName age gender about photoUrl skills about";
 
 function isDuplicateKeyError(error) {
   return (
@@ -109,13 +110,20 @@ const getPendingRequests = async (loggedInUserId) => {
 };
 
 const getConnections = async (loggedInUserId) => {
-  const connections = await ConnectionRequest.find({
+  const data = await ConnectionRequest.find({
     $or: [{ toUserId: loggedInUserId }, { fromUserId: loggedInUserId }],
     status: "accepted",
   })
-    .select("fromUserId toUserId")
-    .populate("fromUserId", "firstName")
-    .populate("toUserId", "firstName");
+    .select(USER_SAFE_DATA)
+    .populate("fromUserId", USER_SAFE_DATA)
+    .populate("toUserId", USER_SAFE_DATA);
+
+  const connections = data.map((row) => {
+    if (row.fromUserId._id.toString() === loggedInUserId.toString()) {
+      return row.toUserId;
+    }
+    return row.fromUserId;
+  });
 
   return connections;
 };
